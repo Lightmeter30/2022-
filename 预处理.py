@@ -13,6 +13,8 @@ w = {'未风化': 0, '无风化': 0, '风化': 1}
 d = {'A': 0, 'B': 1, 'C': 2}  # decorate 纹饰
 t = {'高钾': 0, '铅钡': 1}  # type 类型
 c = {'蓝绿': 0, '浅蓝': 1, '紫': 2, '深绿': 3, '深蓝': 4, '浅绿': 5, '黑': 6, '绿': 7}  # color 颜色
+
+
 def read():
     df1 = pd.read_excel("data.xlsx", "表单1")
     df2 = pd.read_excel("data.xlsx", "表单2")
@@ -54,7 +56,7 @@ def unit():
     return u_matrix
 
 
-def save(rows):
+def save(rows, name):
     workbook = xlwt.Workbook()
     sheet = workbook.add_sheet("Sheet")
 
@@ -62,7 +64,7 @@ def save(rows):
         for j in range(len(rows[i])):
             sheet.write(i, j, rows[i][j])
 
-    workbook.save("unit.xls")
+    workbook.save(name + ".xls")
 
 
 def to_bin(line):
@@ -89,10 +91,24 @@ def to_bin(line):
     return new_line
 
 
+def sort(sortLineNum, u_matrix):
+    # 按照列号分类
+    matrix1 = []
+    matrix2 = []
+    for line in u_matrix:
+        if line[sortLineNum] == 1:
+            matrix1.append(line)
+        else:
+            matrix2.append(line)
+    return matrix1, matrix2
 
 
 def main():
-    save(unit())
+    df = pd.read_excel("unit.xlsx", "Sheet1")
+    matrix1, matrix2 = sort(4, np.array(df))
+    save(matrix1, "高钾")
+    save(matrix2, "铅钡")
+
 
 if __name__ == '__main__':
     main()
