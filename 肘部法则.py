@@ -22,7 +22,7 @@ def main():
         km.fit(data_scaled)
         distortions.append(km.inertia_)
     plt.figure(dpi=150)
-    plt.plot(range(14), distortions, marker='o')
+    plt.plot(range(1, 15), distortions, marker='o')
     plt.xlabel("Number of clusters")
     plt.ylabel("Distortion")
     plt.show()
