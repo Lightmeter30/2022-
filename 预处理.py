@@ -14,6 +14,7 @@ d = {'A': 0, 'B': 1, 'C': 2}  # decorate 纹饰
 t = {'高钾': 0, '铅钡': 1}  # type 类型
 c = {'蓝绿': 0, '浅蓝': 1, '紫': 2, '深绿': 3, '深蓝': 4, '浅绿': 5, '黑': 6, '绿': 7}  # color 颜色
 
+unit_label = ['编号',	'A',	'B',	'C',	'高钾',	'铅钡',	'蓝绿',	'浅蓝',	'紫',	'深绿',	'深蓝',	'浅绿',	'黑',	'绿',	'表面风化',	'二氧化硅(SiO2)',	'氧化钠(Na2O)',	'氧化钾(K2O)',	'氧化钙(CaO)',	'氧化镁(MgO)',	'氧化铝(Al2O3)',	'氧化铁(Fe2O3)',	'氧化铜(CuO)',	'氧化铅(PbO)',	'氧化钡(BaO)',	'五氧化二磷(P2O5)',	'氧化锶(SrO)',	'氧化锡(SnO2)',	'二氧化硫(SO2)']
 
 def read():
     df1 = pd.read_excel("data.xlsx", "表单1")
@@ -56,13 +57,15 @@ def unit():
     return u_matrix
 
 
-def save(rows, name):
+def save(rows, name, label):
     workbook = xlwt.Workbook()
     sheet = workbook.add_sheet("Sheet")
+    for i in range(len(label)):
+        sheet.write(0, i, label[i])
 
-    for i in range(len(rows)):
-        for j in range(len(rows[i])):
-            sheet.write(i, j, rows[i][j])
+    for i in range(1, len(rows) + 1):
+        for j in range(len(rows[i - 1])):
+            sheet.write(i, j, rows[i - 1][j])
 
     workbook.save(name + ".xls")
 
@@ -104,10 +107,10 @@ def sort(sortLineNum, u_matrix):
 
 
 def main():
-    df = pd.read_excel("unit.xlsx", "Sheet1")
-    matrix1, matrix2 = sort(4, np.array(df))
-    save(matrix1, "高钾")
-    save(matrix2, "铅钡")
+    df = pd.read_excel("铅钡.xls", "Sheet")
+    matrix1, matrix2 = sort(14, np.array(df))
+    save(matrix1, "铅钡风化", label=unit_label)
+    save(matrix2, "铅钡未风化", label=unit_label)
 
 
 if __name__ == '__main__':

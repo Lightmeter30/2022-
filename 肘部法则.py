@@ -10,6 +10,7 @@ from sklearn import preprocessing
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 
+point_num = 10
 
 def main():
     df_matrix = np.array(pd.read_excel("铅钡.xls", "Sheet"))
@@ -19,12 +20,12 @@ def main():
     data_scaled = preprocessing.scale(data)
 
     distortions = []
-    for i in range(1, 15):
+    for i in range(1, point_num):
         km = KMeans(n_clusters=i, init='k-means++', n_init=10, max_iter=300, random_state=0)
         km.fit(data_scaled)
         distortions.append(km.inertia_)
     plt.figure(dpi=150)
-    plt.plot(range(1, 15), distortions, marker='o')
+    plt.plot(range(1, point_num), distortions, marker='o')
     plt.xlabel("Number of clusters")
     plt.ylabel("Distortion")
     plt.show()
