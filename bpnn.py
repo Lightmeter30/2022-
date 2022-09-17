@@ -35,9 +35,9 @@ def save(rows, name):
     workbook = xlwt.Workbook()
     sheet = workbook.add_sheet("Sheet")
 
-    for i in range(len(rows)):
-        for j in range(len(rows[i])):
-            sheet.write(i, j, rows[i][j])
+    for i in range(1, len(rows) + 1):
+        for j in range(len(rows[i - 1])):
+            sheet.write(i, j, rows[i - 1][j])
 
     workbook.save(name + ".xls")
 
@@ -123,15 +123,17 @@ class Bpnn:  # BP neural network 一个三层的BP神经网络
         self.input_correction = self.lr * np.dot(delta_xh.reshape(-1, 1), self.x_vector.reshape(1, -1)).T
         return error
 
-    def train(self, train_data, train_label):
+    def train(self, train_data, train_label, loop):
         if len(train_label) != len(train_data):
             raise ValueError("训练数据与标签数量不符")
-        for k in range(20000):
+
+        for k in range(loop):
+            error = 0
             for i in range(len(train_data)):
                 self.forward_propagation(train_data[i])
-                error = self.backward_propagation(train_label[i], 0.1)
-                if k % 100 == 0 and i == 0:
-                    print('########################误差 %-.5f######################第%d次迭代' % (error, k))
+                error += self.backward_propagation(train_label[i], 0.1)
+            if k % 100 == 0:
+                print('########################误差 %-.5f######################第%d次迭代' % (error / len(train_data), k))
 
     def test(self, test_data, test_label):
         if len(test_label) != len(test_data):
@@ -143,28 +145,13 @@ class Bpnn:  # BP neural network 一个三层的BP神经网络
         print("全局误差：%f" % (error / len(test_label)))
         print("测试完成")
 
-    def saveMatrix(self):
-        save(self.weight_xh, "weight_xh")
-        save(self.weight_hy, "weight_hy")
+    def saveMatrix(self, xh_name, hy_name):
+        save(self.weight_xh, xh_name)
+        save(self.weight_hy, hy_name)
+
+    def getWeightFromXlsx(self, xh_xlsx_path, hy_xlsx_path):
+        self.weight_xh = np.array(pd.read_excel(xh_xlsx_path, "Sheet"))
+        self.weight_hy = np.array(pd.read_excel(hy_xlsx_path, "Sheet"))
 
     def predict(self, data):
-        print(self.forward_propagation(data))
-
-
-def main():
-    df = pd.read_excel("unit.xlsx", "Sheet1")
-    matrix = np.array(df)
-    label = []
-    data = []
-    for line in matrix:
-        label.append(line[15:] / 100)
-        data.append(line[1:15])
-    my_bpnn = Bpnn(14, 20, 14)
-    my_bpnn.train(data, label)
-    my_bpnn.test(data, label)
-    my_bpnn.saveMatrix()
-    my_bpnn.predict(data[0])
-
-
-if __name__ == '__main__':
-    main()
+        return self.forward_propagation(data)
